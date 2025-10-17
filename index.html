@@ -44,11 +44,12 @@
   <form id="photoForm">
     <input type="text" name="fullName" placeholder="Full Name" required><br>
 
-    <!-- Uploadcare widget (visible) -->
+    <!-- Uploadcare widget with permanent crop -->
     <input
       type="hidden"
       role="uploadcare-uploader"
       data-crop="1:1"
+      data-effects="crop"
       data-image-shrink="600x600"
       data-tabs="file camera"
       data-clearable="true"
@@ -81,15 +82,16 @@
         return;
       }
 
-      const croppedUrl = file.cdnUrl + '-/crop/600x600/center/-/preview/';
+      // This is now the cropped image stored in Uploadcare
+      const finalUrl = file.cdnUrl;
+
       preview.innerHTML = `
         <p><strong>${fullName}</strong><br>
         Cropped image uploaded successfully!</p>
-        <img src="${croppedUrl}" alt="Cropped 2x2 Image"><br>
-        <small><a href="${croppedUrl}" target="_blank">${croppedUrl}</a></small>
+        <img src="${finalUrl}" alt="Cropped 2x2 Image"><br>
+        <small><a href="${finalUrl}" target="_blank">${finalUrl}</a></small>
       `;
     });
   </script>
 </body>
 </html>
-
