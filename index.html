@@ -23,6 +23,15 @@
       margin: 10px 0;
       font-size: 16px;
     }
+    .uploadcare--widget__button_type_open {
+      background-color: #007bff !important;
+      color: white !important;
+      border-radius: 6px;
+      padding: 10px 15px;
+      font-size: 16px;
+      border: none;
+      cursor: pointer;
+    }
     .preview img {
       margin-top: 15px;
       max-width: 2in;
@@ -38,7 +47,49 @@
   <form id="photoForm">
     <input type="text" name="fullName" placeholder="Full Name" required><br>
 
-    <!-- Uploadcare widget -->
-    <input 
+    <!-- Uploadcare visible upload button -->
+    <input
       type="hidden"
-      role="uploadcare-u
+      role="uploadcare-uploader"
+      data-crop="1:1"
+      data-image-shrink="600x600"
+      data-tabs="file camera"
+      data-clearable="true"
+      name="photo"
+      required
+    />
+
+    <button type="submit">Submit</button>
+  </form>
+
+  <div class="preview" id="preview"></div>
+
+  <script>
+    const form = document.getElementById('photoForm');
+    const preview = document.getElementById('preview');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const fullName = form.fullName.value.trim();
+      if (!fullName) {
+        alert('Please enter your full name.');
+        return;
+      }
+
+      // Wait for the Uploadcare file to resolve
+      const file = await uploadcare.fileFrom('uploaded', form.photo.value);
+
+      // Create a 2×2 cropped image URL
+      const croppedUrl = file.cdnUrl + '-/crop/600x600/center/-/preview/';
+
+      // Display preview and link
+      preview.innerHTML = `
+        <p><strong>${fullName}</strong><br>
+        Cropped image uploaded successfully!</p>
+        <img src="${croppedUrl}" alt="Cropped 2x2 Image"><br>
+        <small><a href="${croppedUrl}" target="_blank">${croppedUrl}</a></small>
+      `;
+    });
+  </script>
+</body>
+</html>
