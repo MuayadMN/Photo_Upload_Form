@@ -6,12 +6,9 @@
 
   <!-- Uploadcare setup -->
   <script>
-    UPLOADCARE_PUBLIC_KEY = '318f287bfbbdd994f6bc'; // 👈 replace this with your actual public key
+    UPLOADCARE_PUBLIC_KEY = '318f287bfbbdd994f6bc'; // Replace with your actual public key
   </script>
   <script src="https://ucarecdn.com/libs/widget/3.x/uploadcare.full.min.js"></script>
-  <script>
-    uploadcare.registerTab('preview', uploadcareTabEffects);
-  </script>
 
   <style>
     body {
@@ -47,7 +44,7 @@
   <form id="photoForm">
     <input type="text" name="fullName" placeholder="Full Name" required><br>
 
-    <!-- Uploadcare widget -->
+    <!-- Uploadcare widget (visible) -->
     <input
       type="hidden"
       role="uploadcare-uploader"
