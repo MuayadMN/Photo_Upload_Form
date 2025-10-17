@@ -3,10 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <title>2x2 Photo Upload Form</title>
+
+  <!-- Uploadcare setup -->
   <script>
-    UPLOADCARE_PUBLIC_KEY = '318f287bfbbdd994f6bc';
+    UPLOADCARE_PUBLIC_KEY = '318f287bfbbdd994f6bc';  <!-- 👈 replace this -->
   </script>
   <script src="https://ucarecdn.com/libs/widget/3.x/uploadcare.full.min.js"></script>
+
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -18,38 +21,24 @@
       padding: 10px;
       width: 90%;
       margin: 10px 0;
+      font-size: 16px;
+    }
+    .preview img {
+      margin-top: 15px;
+      max-width: 2in;
+      max-height: 2in;
+      border: 1px solid #ccc;
+      border-radius: 8px;
     }
   </style>
 </head>
 <body>
-  <h2>Upload Your 2x2 Photo</h2>
-  
+  <h2>Upload Your 2×2 Photo</h2>
+
   <form id="photoForm">
     <input type="text" name="fullName" placeholder="Full Name" required><br>
-    
-    <!-- Uploadcare widget with square crop -->
+
+    <!-- Uploadcare widget -->
     <input 
       type="hidden"
-      role="uploadcare-uploader"
-      data-crop="1:1"               <!-- square crop -->
-      data-image-shrink="600x600"   <!-- resize to ~2x2 inches at 300 DPI -->
-      data-tabs="file camera"       <!-- allow upload or direct camera -->
-      name="photo"
-      required
-    />
-    
-    <button type="submit">Submit</button>
-  </form>
-
-  <script>
-    const form = document.getElementById('photoForm');
-    form.addEventListener('submit', (e) => {
-      e.preventDefault();
-      const fullName = form.fullName.value;
-      const fileUrl = form.photo.value;
-      alert(Name: ${fullName}\nPhoto URL: ${fileUrl});
-      // You can later send this data to your backend or Google Sheet
-    });
-  </script>
-</body>
-</html>
+      role="uploadcare-u
