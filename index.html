@@ -6,9 +6,12 @@
 
   <!-- Uploadcare setup -->
   <script>
-    UPLOADCARE_PUBLIC_KEY = '318f287bfbbdd994f6bc';  <!-- 👈 replace this -->
+    UPLOADCARE_PUBLIC_KEY = '318f287bfbbdd994f6bc'; // 👈 replace this with your actual public key
   </script>
   <script src="https://ucarecdn.com/libs/widget/3.x/uploadcare.full.min.js"></script>
+  <script>
+    uploadcare.registerTab('preview', uploadcareTabEffects);
+  </script>
 
   <style>
     body {
@@ -35,19 +38,16 @@
     .preview img {
       margin-top: 15px;
       max-width: 2in;
-      max-height: 2in;
-      border: 1px solid #ccc;
-      border-radius: 8px;
+      height: auto;
     }
   </style>
 </head>
 <body>
-  <h2>Upload Your 2×2 Photo</h2>
-
+  <h2>2×2 Photo Upload</h2>
   <form id="photoForm">
     <input type="text" name="fullName" placeholder="Full Name" required><br>
 
-    <!-- Uploadcare visible upload button -->
+    <!-- Uploadcare widget -->
     <input
       type="hidden"
       role="uploadcare-uploader"
@@ -76,13 +76,15 @@
         return;
       }
 
-      // Wait for the Uploadcare file to resolve
-      const file = await uploadcare.fileFrom('uploaded', form.photo.value);
+      const widget = uploadcare.Widget('[name=photo]');
+      const file = await widget.value();
 
-      // Create a 2×2 cropped image URL
+      if (!file) {
+        alert('Please upload a photo.');
+        return;
+      }
+
       const croppedUrl = file.cdnUrl + '-/crop/600x600/center/-/preview/';
-
-      // Display preview and link
       preview.innerHTML = `
         <p><strong>${fullName}</strong><br>
         Cropped image uploaded successfully!</p>
@@ -93,3 +95,4 @@
   </script>
 </body>
 </html>
+
