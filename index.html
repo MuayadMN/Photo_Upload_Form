@@ -73,7 +73,6 @@
       const uuid = file.uuid;
       const originalUrl = `https://ucarecdn.com/${uuid}/`;
 
-      // Send to backend to store the image
       const response = await fetch('http://localhost:3000/store-original', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -83,7 +82,20 @@
       const result = await response.json();
       const finalUrl = result.finalUrl;
 
-      // ✅ Confirmation message
       preview.innerHTML = `
         <div style="border: 2px solid #4CAF50; padding: 15px; border-radius: 8px; background-color: #f0fff0;">
-          <h3>✅ Submission Successful
+          <h3>✅ Submission Successful</h3>
+          <p>Thank you, <strong>${fullName}</strong>! Your photo has been submitted.</p>
+          <img src="${finalUrl}" alt="Submitted Image"><br>
+          <a href="${finalUrl}" target="_blank">${finalUrl}</a>
+        </div>
+      `;
+
+      // Optional: reset form
+      // form.reset();
+      // widget.value(null);
+    });
+  </script>
+</body>
+</html>
+
