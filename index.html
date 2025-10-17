@@ -70,32 +70,17 @@
         return;
       }
 
-      const uuid = file.uuid;
-      const originalUrl = `https://ucarecdn.com/${uuid}/`;
-
-      const response = await fetch('http://localhost:3000/store-original', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ originalUrl })
-      });
-
-      const result = await response.json();
-      const finalUrl = result.finalUrl;
+      const imageUrl = file.cdnUrl;
 
       preview.innerHTML = `
         <div style="border: 2px solid #4CAF50; padding: 15px; border-radius: 8px; background-color: #f0fff0;">
           <h3>✅ Submission Successful</h3>
           <p>Thank you, <strong>${fullName}</strong>! Your photo has been submitted.</p>
-          <img src="${finalUrl}" alt="Submitted Image"><br>
-          <a href="${finalUrl}" target="_blank">${finalUrl}</a>
+          <img src="${imageUrl}" alt="Submitted Image"><br>
+          <a href="${imageUrl}" target="_blank">${imageUrl}</a>
         </div>
       `;
-
-      // Optional: reset form
-      // form.reset();
-      // widget.value(null);
     });
   </script>
 </body>
 </html>
-
