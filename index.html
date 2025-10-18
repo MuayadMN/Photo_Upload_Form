@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <title>Photo Upload Form</title>
-  <script src="https://ucarecdn.com/libs/widget/3.x/uploadcare.full.min.js"></script>
+  <script src="https://ucarecdn.com/libs/widget/3.x/uploadcare.full.min.js" charset="UTF-8"></script>
   <script>
     UPLOADCARE_PUBLIC_KEY = '318f287bfbbdd994f6bc';
   </script>
@@ -101,7 +101,7 @@
         `;
       } catch (err) {
         alert('Upload failed. Please try again.');
-        console.error(err);
+        console.error('Upload error:', err);
       }
     });
   </script>
