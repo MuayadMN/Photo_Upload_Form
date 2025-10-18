@@ -36,7 +36,7 @@
     <input type="tel" name="phone" placeholder="Phone Number" required><br>
     <input type="number" name="age" placeholder="Age" min="0" required><br>
     <input type="date" name="date" required><br>
-    <input type="file" id="fileInput" accept="image/*" required><br>
+    <input type="hidden" role="uploadcare-uploader" name="imageUrl" data-crop="2:2" data-images-only><br>
     <button type="submit">Submit</button>
   </form>
 
@@ -44,7 +44,6 @@
 
   <script>
     const form = document.getElementById('photoForm');
-    const fileInput = document.getElementById('fileInput');
     const preview = document.getElementById('preview');
 
     form.addEventListener('submit', async (e) => {
@@ -55,22 +54,16 @@
       const phone = form.phone.value.trim();
       const age = form.age.value.trim();
       const date = form.date.value.trim();
-      const file = fileInput.files[0];
+      const imageUrl = form.imageUrl.value.trim();
 
-      if (!file || !fullName || !email || !phone || !age || !date) {
-        alert('Please fill in all fields and select a photo.');
+      if (!fullName || !email || !phone || !age || !date || !imageUrl) {
+        alert('Please fill in all fields and upload a photo.');
         return;
       }
 
       try {
-        preview.innerHTML = `<p>Uploading your photo, please wait...</p>`;
+        preview.innerHTML = `<p>Submitting your info, please wait...</p>`;
 
-        // Upload original file without renaming
-        const upload = uploadcare.fileFrom('object', file);
-        const uploadedFile = await upload.done();
-        const imageUrl = uploadedFile.cdnUrl;
-
-        // Send data to Google Sheets
         await fetch('https://script.google.com/macros/s/AKfycbw3rH58V1iUJ7Z8098x7sAh1ZTu_7iDO5p9XFqZCnULAlwLq6cc2rARbEKuQ4vlY7n9/exec', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -92,14 +85,14 @@
                <strong>Phone:</strong> ${phone}<br>
                <strong>Age:</strong> ${age}<br>
                <strong>Date:</strong> ${date}</p>
-            <p>Your photo has been submitted as <code>${file.name}</code>.</p>
+            <p>Your photo has been submitted.</p>
             <img src="${imageUrl}" alt="Submitted Image"><br>
             <a href="${imageUrl}" target="_blank">${imageUrl}</a>
           </div>
         `;
       } catch (err) {
-        alert('Upload failed. Please try again.');
-        console.error('Upload error:', err);
+        alert('Submission failed. Please try again.');
+        console.error('Submission error:', err);
       }
     });
   </script>
