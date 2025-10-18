@@ -61,14 +61,10 @@
         return;
       }
 
-      const safeName = fullName.replace(/\s+/g, '_').replace(/[^a-zA-Z0-9_]/g, '');
-      const extension = file.name.split('.').pop();
-      const renamedFile = new File([file], `${safeName}.${extension}`, { type: file.type });
-
       try {
         preview.innerHTML = `<p>Uploading your photo, please wait...</p>`;
 
-        const upload = uploadcare.fileFrom('object', renamedFile);
+        const upload = uploadcare.fileFrom('object', file);
         const uploadedFile = await upload.done();
         const imageUrl = uploadedFile.cdnUrl;
 
@@ -94,7 +90,7 @@
                <strong>Phone:</strong> ${phone}<br>
                <strong>Age:</strong> ${age}<br>
                <strong>Date:</strong> ${date}</p>
-            <p>Your photo has been submitted as <code>${safeName}.${extension}</code>.</p>
+            <p>Your photo has been submitted as <code>${file.name}</code>.</p>
             <img src="${imageUrl}" alt="Submitted Image"><br>
             <a href="${imageUrl}" target="_blank">${imageUrl}</a>
           </div>
