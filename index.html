@@ -5,6 +5,8 @@
   <title>Photo Upload Form</title>
   <script>
     UPLOADCARE_PUBLIC_KEY = '318f287bfbbdd994f6bc'; // Replace with your public key
+    UPLOADCARE_TABS = 'file camera';
+    UPLOADCARE_CLEARABLE = true;
   </script>
   <script src="https://ucarecdn.com/libs/widget/3.x/uploadcare.full.min.js"></script>
   <style>
@@ -37,16 +39,15 @@
   </style>
 </head>
 <body>
-  <h2>Upload Your Photo for Your 2x2" Flu Shot Magnet!</h2>
+  <h2>Upload Your Photo for Your 2x2&quot; Flu Shot Magnet!</h2>
   <form id="photoForm">
     <input type="text" name="fullName" placeholder="Full Name" required><br>
 
     <input
       type="hidden"
       role="uploadcare-uploader"
-      data-tabs="file camera"
-      data-clearable="true"
       name="photo"
+      id="uploader"
       required
     />
 
@@ -58,19 +59,29 @@
   <script>
     const form = document.getElementById('photoForm');
     const preview = document.getElementById('preview');
+    const widget = uploadcare.Widget('#uploader');
+
+    let uploadedFile = null;
+
+    widget.onUploadComplete(async (info) => {
+      const fullName = form.fullName.value.trim();
+      if (!fullName) return;
+
+      const file = uploadcare.fileFrom('uploaded', info.uuid);
+      const renamedFile = file.then(file => file.store({ name: `${fullName.replace(/\s+/g, '_')}.jpg` }));
+      uploadedFile = await renamedFile;
+    });
 
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
       const fullName = form.fullName.value.trim();
-      const widget = uploadcare.Widget('[name=photo]');
-      const file = await widget.value();
 
-      if (!file) {
+      if (!uploadedFile) {
         alert('Please upload a photo.');
         return;
       }
 
-      const imageUrl = file.cdnUrl;
+      const imageUrl = uploadedFile.cdnUrl;
 
       preview.innerHTML = `
         <div style="border: 2px solid #4CAF50; padding: 15px; border-radius: 8px; background-color: #f0fff0;">
