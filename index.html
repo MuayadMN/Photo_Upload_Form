@@ -3,12 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <title>Photo Upload Form</title>
-  <script>
-    UPLOADCARE_PUBLIC_KEY = '318f287bfbbdd994f6bc'; // Replace with your public key
-    UPLOADCARE_TABS = 'file camera';
-    UPLOADCARE_CLEARABLE = true;
-  </script>
   <script src="https://ucarecdn.com/libs/widget/3.x/uploadcare.full.min.js"></script>
+  <script>
+    UPLOADCARE_PUBLIC_KEY = '318f287bfbbdd994f6bc';
+  </script>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -22,15 +20,6 @@
       margin: 10px 0;
       font-size: 16px;
     }
-    .uploadcare--widget__button_type_open {
-      background-color: #007bff !important;
-      color: white !important;
-      border-radius: 6px;
-      padding: 10px 15px;
-      font-size: 16px;
-      border: none;
-      cursor: pointer;
-    }
     .preview img {
       margin-top: 15px;
       max-width: 2in;
@@ -39,18 +28,10 @@
   </style>
 </head>
 <body>
-  <h2>Upload Your Photo for Your 2x2&quot; Flu Shot Magnet!</h2>
+  <h2>Upload Your Photo for Your 2x2" Flu Shot Magnet!</h2>
   <form id="photoForm">
     <input type="text" name="fullName" placeholder="Full Name" required><br>
-
-    <input
-      type="hidden"
-      role="uploadcare-uploader"
-      name="photo"
-      id="uploader"
-      required
-    />
-
+    <input type="file" id="fileInput" accept="image/*" required><br>
     <button type="submit">Submit</button>
   </form>
 
@@ -58,39 +39,43 @@
 
   <script>
     const form = document.getElementById('photoForm');
+    const fileInput = document.getElementById('fileInput');
     const preview = document.getElementById('preview');
-    const widget = uploadcare.Widget('#uploader');
-
-    let uploadedFile = null;
-
-    widget.onUploadComplete(async (info) => {
-      const fullName = form.fullName.value.trim();
-      if (!fullName) return;
-
-      const file = uploadcare.fileFrom('uploaded', info.uuid);
-      const renamedFile = file.then(file => file.store({ name: `${fullName.replace(/\s+/g, '_')}.jpg` }));
-      uploadedFile = await renamedFile;
-    });
 
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
-      const fullName = form.fullName.value.trim();
 
-      if (!uploadedFile) {
-        alert('Please upload a photo.');
+      const fullName = form.fullName.value.trim();
+      const file = fileInput.files[0];
+
+      if (!file || !fullName) {
+        alert('Please enter your name and select a photo.');
         return;
       }
 
-      const imageUrl = uploadedFile.cdnUrl;
+      // Format filename: "John_Doe.jpg"
+      const safeName = fullName.replace(/\s+/g, '_').replace(/[^a-zA-Z0-9_]/g, '');
+      const extension = file.name.split('.').pop();
+      const renamedFile = new File([file], `${safeName}.${extension}`, { type: file.type });
 
-      preview.innerHTML = `
-        <div style="border: 2px solid #4CAF50; padding: 15px; border-radius: 8px; background-color: #f0fff0;">
-          <h3>✅ Submission Successful</h3>
-          <p>Thank you, <strong>${fullName}</strong>! Your photo has been submitted.</p>
-          <img src="${imageUrl}" alt="Submitted Image"><br>
-          <a href="${imageUrl}" target="_blank">${imageUrl}</a>
-        </div>
-      `;
+      try {
+        const upload = uploadcare.fileFrom('object', renamedFile);
+        const uploadedFile = await upload.done();
+
+        const imageUrl = uploadedFile.cdnUrl;
+
+        preview.innerHTML = `
+          <div style="border: 2px solid #4CAF50; padding: 15px; border-radius: 8px; background-color: #f0fff0;">
+            <h3>✅ Submission Successful</h3>
+            <p>Thank you, <strong>${fullName}</strong>! Your photo has been submitted.</p>
+            <img src="${imageUrl}" alt="Submitted Image"><br>
+            <a href="${imageUrl}" target="_blank">${imageUrl}</a>
+          </div>
+        `;
+      } catch (err) {
+        alert('Upload failed. Please try again.');
+        console.error(err);
+      }
     });
   </script>
 </body>
