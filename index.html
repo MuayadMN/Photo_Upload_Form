@@ -6,6 +6,7 @@
   <script src="https://ucarecdn.com/libs/widget/3.x/uploadcare.full.min.js" charset="UTF-8"></script>
   <script>
     UPLOADCARE_PUBLIC_KEY = '318f287bfbbdd994f6bc';
+    UPLOADCARE_LOCALE = 'en';
   </script>
   <style>
     body {
@@ -64,6 +65,7 @@
       try {
         preview.innerHTML = `<p>Uploading your photo, please wait...</p>`;
 
+        // Upload original file without renaming
         const upload = uploadcare.fileFrom('object', file);
         const uploadedFile = await upload.done();
         const imageUrl = uploadedFile.cdnUrl;
