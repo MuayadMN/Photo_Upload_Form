@@ -2,26 +2,45 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Photo Upload Debug</title>
+  <title>Photo Upload Form</title>
   <script src="https://ucarecdn.com/libs/widget/3.x/uploadcare.full.min.js" charset="UTF-8"></script>
   <script>
     UPLOADCARE_PUBLIC_KEY = '318f287bfbbdd994f6bc';
     UPLOADCARE_LOCALE = 'en';
   </script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 400px;
+      margin: 50px auto;
+      text-align: center;
+    }
+    input, button {
+      padding: 10px;
+      width: 90%;
+      margin: 10px 0;
+      font-size: 16px;
+    }
+    .preview img {
+      margin-top: 15px;
+      max-width: 2in;
+      height: auto;
+    }
+  </style>
 </head>
 <body>
-  <h2>Upload Test</h2>
+  <h2>Upload Your Photo for Your 2x2" Flu Shot Magnet!</h2>
   <form id="photoForm">
     <input type="text" name="fullName" placeholder="Full Name" required><br>
-    <input type="email" name="email" placeholder="Email" required><br>
-    <input type="tel" name="phone" placeholder="Phone" required><br>
-    <input type="number" name="age" placeholder="Age" required><br>
+    <input type="email" name="email" placeholder="Email Address" required><br>
+    <input type="tel" name="phone" placeholder="Phone Number" required><br>
+    <input type="number" name="age" placeholder="Age" min="0" required><br>
     <input type="date" name="date" required><br>
-    <input type="hidden" role="uploadcare-uploader" name="imageUrl" data-images-only required><br>
+    <input type="hidden" role="uploadcare-uploader" name="imageUrl" data-crop="2:2" data-images-only required><br>
     <button type="submit">Submit</button>
   </form>
 
-  <div id="preview"></div>
+  <div class="preview" id="preview"></div>
 
   <script>
     const form = document.getElementById('photoForm');
@@ -37,27 +56,46 @@
       const date = form.date.value.trim();
       const imageUrl = form.imageUrl.value.trim();
 
-      console.log("Form values:", { fullName, email, phone, age, date, imageUrl });
-
       if (!fullName || !email || !phone || !age || !date || !imageUrl) {
-        alert("All fields are required, including the photo.");
+        alert('Please fill in all fields and upload a photo.');
         return;
       }
 
       try {
+        preview.innerHTML = `<p>Submitting your info, please wait...</p>`;
+
         const response = await fetch('https://script.google.com/macros/s/AKfycbw3rH58V1iUJ7Z8098x7sAh1ZTu_7iDO5p9XFqZCnULAlwLq6cc2rARbEKuQ4vlY7n9/exec', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ fullName, email, phone, age, date, imageUrl })
+          body: JSON.stringify({
+            fullName,
+            email,
+            phone,
+            age,
+            date,
+            imageUrl
+          })
         });
 
         const result = await response.text();
         console.log("Google Sheets response:", result);
 
-        preview.innerHTML = `<p>✅ Submitted successfully!</p><img src="${imageUrl}" width="150">`;
+        preview.innerHTML = `
+          <div style="border: 2px solid #4CAF50; padding: 15px; border-radius: 8px; background-color: #f0fff0;">
+            <h3>✅ Submission Successful</h3>
+            <p>Thank you, <strong>${fullName}</strong>!</p>
+            <p><strong>Email:</strong> ${email}<br>
+               <strong>Phone:</strong> ${phone}<br>
+               <strong>Age:</strong> ${age}<br>
+               <strong>Date:</strong> ${date}</p>
+            <p>Your photo has been submitted.</p>
+            <img src="${imageUrl}" alt="Submitted Image"><br>
+            <a href="${imageUrl}" target="_blank">${imageUrl}</a>
+          </div>
+        `;
       } catch (err) {
-        console.error("Submission error:", err);
-        alert("Upload failed. Check the console for details.");
+        alert('Submission failed. Please try again.');
+        console.error('Submission error:', err);
       }
     });
   </script>
