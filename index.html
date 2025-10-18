@@ -3,10 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <title>Photo Upload Form</title>
-  <script src="https://ucarecdn.com/libs/widget/3.x/uploadcare.full.min.js" charset="UTF-8"></script>
+  <script src="https://ucarecdn.com/libs/widget/3.x/uploadcare.full.min.js"></script>
   <script>
     UPLOADCARE_PUBLIC_KEY = '318f287bfbbdd994f6bc';
-    UPLOADCARE_LOCALE = 'en';
   </script>
   <style>
     body {
@@ -32,11 +31,7 @@
   <h2>Upload Your Photo for Your 2x2" Flu Shot Magnet!</h2>
   <form id="photoForm">
     <input type="text" name="fullName" placeholder="Full Name" required><br>
-    <input type="email" name="email" placeholder="Email Address" required><br>
-    <input type="tel" name="phone" placeholder="Phone Number" required><br>
-    <input type="number" name="age" placeholder="Age" min="0" required><br>
-    <input type="date" name="date" required><br>
-    <input type="hidden" role="uploadcare-uploader" name="imageUrl" data-crop="2:2" data-images-only required><br>
+    <input type="file" id="fileInput" accept="image/*" required><br>
     <button type="submit">Submit</button>
   </form>
 
@@ -44,55 +39,42 @@
 
   <script>
     const form = document.getElementById('photoForm');
+    const fileInput = document.getElementById('fileInput');
     const preview = document.getElementById('preview');
 
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
 
       const fullName = form.fullName.value.trim();
-      const email = form.email.value.trim();
-      const phone = form.phone.value.trim();
-      const age = form.age.value.trim();
-      const date = form.date.value.trim();
-      const imageUrl = form.imageUrl.value.trim();
+      const file = fileInput.files[0];
 
-      if (!fullName || !email || !phone || !age || !date || !imageUrl) {
-        alert('Please fill in all fields and upload a photo.');
+      if (!file || !fullName) {
+        alert('Please enter your name and select a photo.');
         return;
       }
 
-      const formData = new URLSearchParams();
-      formData.append("fullName", fullName);
-      formData.append("email", email);
-      formData.append("phone", phone);
-      formData.append("age", age);
-      formData.append("date", date);
-      formData.append("imageUrl", imageUrl);
+      // Sanitize and format the filename
+      const safeName = fullName.replace(/\s+/g, '_').replace(/[^a-zA-Z0-9_]/g, '');
+      const extension = file.name.split('.').pop();
+      const renamedFile = new File([file], `${safeName}.${extension}`, { type: file.type });
 
       try {
-        preview.innerHTML = `<p>Submitting your info, please wait...</p>`;
+        const upload = uploadcare.fileFrom('object', renamedFile);
+        const uploadedFile = await upload.done();
 
-        await fetch('https://script.google.com/macros/s/AKfycbw3rH58V1iUJ7Z8098x7sAh1ZTu_7iDO5p9XFqZCnULAlwLq6cc2rARbEKuQ4vlY7n9/exec', {
-          method: 'POST',
-          body: formData
-        });
+        const imageUrl = uploadedFile.cdnUrl;
 
         preview.innerHTML = `
           <div style="border: 2px solid #4CAF50; padding: 15px; border-radius: 8px; background-color: #f0fff0;">
             <h3>✅ Submission Successful</h3>
-            <p>Thank you, <strong>${fullName}</strong>!</p>
-            <p><strong>Email:</strong> ${email}<br>
-               <strong>Phone:</strong> ${phone}<br>
-               <strong>Age:</strong> ${age}<br>
-               <strong>Date:</strong> ${date}</p>
-            <p>Your photo has been submitted.</p>
+            <p>Thank you, <strong>${fullName}</strong>! Your photo has been submitted as <code>${safeName}.${extension}</code>.</p>
             <img src="${imageUrl}" alt="Submitted Image"><br>
             <a href="${imageUrl}" target="_blank">${imageUrl}</a>
           </div>
         `;
       } catch (err) {
-        alert('Submission failed. Please try again.');
-        console.error('Submission error:', err);
+        alert('Upload failed. Please try again.');
+        console.error(err);
       }
     });
   </script>
