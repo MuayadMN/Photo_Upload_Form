@@ -31,6 +31,10 @@
   <h2>Upload Your Photo for Your 2x2" Flu Shot Magnet!</h2>
   <form id="photoForm">
     <input type="text" name="fullName" placeholder="Full Name" required><br>
+    <input type="email" name="email" placeholder="Email Address" required><br>
+    <input type="tel" name="phone" placeholder="Phone Number" required><br>
+    <input type="number" name="age" placeholder="Age" min="0" required><br>
+    <input type="date" name="date" required><br>
     <input type="file" id="fileInput" accept="image/*" required><br>
     <button type="submit">Submit</button>
   </form>
@@ -46,28 +50,51 @@
       e.preventDefault();
 
       const fullName = form.fullName.value.trim();
+      const email = form.email.value.trim();
+      const phone = form.phone.value.trim();
+      const age = form.age.value.trim();
+      const date = form.date.value.trim();
       const file = fileInput.files[0];
 
-      if (!file || !fullName) {
-        alert('Please enter your name and select a photo.');
+      if (!file || !fullName || !email || !phone || !age || !date) {
+        alert('Please fill in all fields and select a photo.');
         return;
       }
 
-      // Sanitize and format the filename
       const safeName = fullName.replace(/\s+/g, '_').replace(/[^a-zA-Z0-9_]/g, '');
       const extension = file.name.split('.').pop();
       const renamedFile = new File([file], `${safeName}.${extension}`, { type: file.type });
 
       try {
+        preview.innerHTML = `<p>Uploading your photo, please wait...</p>`;
+
         const upload = uploadcare.fileFrom('object', renamedFile);
         const uploadedFile = await upload.done();
-
         const imageUrl = uploadedFile.cdnUrl;
+
+        // Send data to Google Sheets
+        await fetch('https://script.google.com/macros/s/AKfycbw3rH58V1iUJ7Z8098x7sAh1ZTu_7iDO5p9XFqZCnULAlwLq6cc2rARbEKuQ4vlY7n9/exec', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            fullName,
+            email,
+            phone,
+            age,
+            date,
+            imageUrl
+          })
+        });
 
         preview.innerHTML = `
           <div style="border: 2px solid #4CAF50; padding: 15px; border-radius: 8px; background-color: #f0fff0;">
             <h3>✅ Submission Successful</h3>
-            <p>Thank you, <strong>${fullName}</strong>! Your photo has been submitted as <code>${safeName}.${extension}</code>.</p>
+            <p>Thank you, <strong>${fullName}</strong>!</p>
+            <p><strong>Email:</strong> ${email}<br>
+               <strong>Phone:</strong> ${phone}<br>
+               <strong>Age:</strong> ${age}<br>
+               <strong>Date:</strong> ${date}</p>
+            <p>Your photo has been submitted as <code>${safeName}.${extension}</code>.</p>
             <img src="${imageUrl}" alt="Submitted Image"><br>
             <a href="${imageUrl}" target="_blank">${imageUrl}</a>
           </div>
